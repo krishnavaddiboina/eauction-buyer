@@ -10,12 +10,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.iiht.buyer.exception.MongoDBException;
 import com.iiht.buyer.model.Buyer;
 import com.iiht.buyer.model.Product;
 import com.iiht.buyer.repository.BuyerRepository;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class BuyerRepositoryImpl implements BuyerRepository {
 
@@ -23,14 +25,17 @@ public class BuyerRepositoryImpl implements BuyerRepository {
 	MongoTemplate mongoTemplate;
 
 	@Override
-	public Product getProductDetails(String productId) {
-		Query query = new Query(Criteria.where("id").is(new ObjectId(productId)));
-		List<Product> products = mongoTemplate.find(query, Product.class);
-		if (products != null && products.size() > 0) {
-			return products.get(0);
-		} else {
-			return null;
+	public Product getProductDetails(String productId) throws MongoDBException {
+		log.debug("Within getProductDetails() of BuyerRepositoryImpl class...");
+		Product product = null;
+		try {
+			product = mongoTemplate.findById(productId, Product.class);
+			log.info("Based on the given product id got the product {}", product);
+		}catch(Exception exception) {
+			log.error("Error occured while getting product details by product id. Error is {}", exception.getMessage());
+			throw new MongoDBException("Error occured while getting product details by product id in mongo db");
 		}
+		return product;
 	}
 
 	@Override

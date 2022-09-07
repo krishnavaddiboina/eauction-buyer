@@ -1,0 +1,13 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /buyer
+spring:
+  data:
+    mongodb:
+      database: eauction
+      uri: mongodb://localhost:27017/eauction
+
+
+
+ 

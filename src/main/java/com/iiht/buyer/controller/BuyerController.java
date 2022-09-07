@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iiht.buyer.model.Buyer;
+import com.iiht.buyer.model.ProductResponse;
 import com.iiht.buyer.service.BuyerService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 public class BuyerController {
 
@@ -20,17 +24,17 @@ public class BuyerController {
 	BuyerService buyerService;
 
 	@PostMapping("/place-bid")
-	public ResponseEntity<String> placeBidForProduct(@RequestBody Buyer buyer) {
-	
-			buyerService.placeBidForProduct(buyer);
-			System.out.println("Bid placed successfully");
-			return new ResponseEntity<String>("Bid placed successfully", HttpStatus.CREATED);
+	public ResponseEntity<ProductResponse> placeBidForProduct(@RequestBody Buyer buyer) {
+		ProductResponse response = new ProductResponse();
+		buyerService.placeBidForProduct(buyer, response);
 		
+		return new ResponseEntity<String>("Bid placed successfully", HttpStatus.CREATED);
 
 	}
-	
+
 	@PostMapping("/update-bid/{productId}/{buyerEmailId}/{newBidAmount}")
-	public ResponseEntity<String> updateBidForProduct(@PathVariable String productId, @PathVariable String buyerEmailId, @PathVariable String newBidAmount) {
+	public ResponseEntity<String> updateBidForProduct(@PathVariable String productId, @PathVariable String buyerEmailId,
+			@PathVariable String newBidAmount) {
 		try {
 			buyerService.updateBidForProduct(productId, buyerEmailId, newBidAmount);
 			System.out.println("Bid updated successfully");

@@ -8,9 +8,9 @@ public interface BuyerRepository {
 	
 	Product getProductDetails(String productId) throws MongoDBException;
 
-	boolean isBidExistWithUser(String productId, String buyerEmail);
+	boolean isBidExistWithUser(String productId, String buyerEmail) throws MongoDBException;
 
-	void updateBidData(String productId, String buyerEmailId, String newBidAmount);
+	boolean updateBidData(String productId, String buyerEmailId, String newBidAmount) throws MongoDBException;
 
-	Buyer placeBidForProduct(Buyer buyer);
+	String placeBidForProduct(Buyer buyer) throws MongoDBException;
 }

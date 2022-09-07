@@ -14,6 +14,7 @@ import com.iiht.buyer.exception.MongoDBException;
 import com.iiht.buyer.model.Buyer;
 import com.iiht.buyer.model.Product;
 import com.iiht.buyer.repository.BuyerRepository;
+import com.mongodb.client.result.UpdateResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +32,7 @@ public class BuyerRepositoryImpl implements BuyerRepository {
 		try {
 			product = mongoTemplate.findById(productId, Product.class);
 			log.info("Based on the given product id got the product {}", product);
-		}catch(Exception exception) {
+		} catch (Exception exception) {
 			log.error("Error occured while getting product details by product id. Error is {}", exception.getMessage());
 			throw new MongoDBException("Error occured while getting product details by product id in mongo db");
 		}
@@ -39,40 +40,56 @@ public class BuyerRepositoryImpl implements BuyerRepository {
 	}
 
 	@Override
-	public boolean isBidExistWithUser(String productId, String buyerEmail) {
+	public boolean isBidExistWithUser(String productId, String buyerEmail) throws MongoDBException {
 		boolean flag = false;
-		Query query = new Query(Criteria.where("id").is(new ObjectId(productId)));
-		List<Buyer> buyers = mongoTemplate.find(query, Buyer.class);
-		if (buyers != null && buyers.size() > 0) {
-			long count = buyers.stream().filter(buyer -> buyer.getEmail().equalsIgnoreCase(buyerEmail)).count();
-			if (count == 0) {
-				flag = true;
-				return flag;
+		try {
+			Query query = new Query(Criteria.where("productId").is(productId));
+			List<Buyer> buyers = mongoTemplate.find(query, Buyer.class);
+			if (buyers != null && buyers.size() > 0) {
+				long count = buyers.stream().filter(buyer -> buyer.getEmail().equalsIgnoreCase(buyerEmail)).count();
+				if (count == 1) {
+					flag = true;
+					return flag;
+				}
 			}
+		} catch (Exception exception) {
+			log.error("Error occured while checking bid exist with user. Error is {}", exception.getMessage());
+			throw new MongoDBException("Error occured while checking bid exist with user in mongo db");
 		}
 		return flag;
 
 	}
 
 	@Override
-	public void updateBidData(String productId, String buyerEmailId, String newBidAmount) {
-
-		Criteria criteria = new Criteria();
-		criteria.and("productId").is(productId);
-		criteria.and("buyerEmailId").is(buyerEmailId);
-
-		Query query = new Query(criteria);
-
-		// Query greatCmtsRemaining =
-		// Query.query(Criteria.where("message").is("Great."));
-		mongoTemplate.updateFirst(query, Update.update("bidAmount", newBidAmount), Buyer.class);
-
+	public boolean updateBidData(String productId, String buyerEmailId, String newBidAmount) throws MongoDBException {
+		log.debug("Within updateBidData() of BuyerRepositoryImpl class...");
+		UpdateResult updateResult = null;
+		try {
+			 updateResult = mongoTemplate.updateFirst(
+					Query.query(Criteria.where("productId").is(productId).and("email").is(buyerEmailId)),
+					Update.update("bidAmount", newBidAmount), Buyer.class);
+			log.info("acknowledged value is {}",updateResult.wasAcknowledged());
+		} catch (Exception exception) {
+			log.error("Error occured while updating bid amount. Error is {}", exception.getMessage());
+			throw new MongoDBException("Error occured while updating bid amount in mongo db");
+		}
+		return updateResult.wasAcknowledged();
 	}
 
 	@Override
-	public Buyer placeBidForProduct(Buyer buyer) {
-
-		return mongoTemplate.save(buyer);
+	public String placeBidForProduct(Buyer buyer) throws MongoDBException {
+		log.debug("Within placeBidForProduct() of BuyerRepositoryImpl class...");
+		String buyerId = null;
+		try {
+			Buyer theBuyer = mongoTemplate.save(buyer);
+			if (theBuyer != null) {
+				return theBuyer.getId();
+			}
+		} catch (Exception exception) {
+			log.error("Error occured while placing bid for the product. Error is {}", exception.getMessage());
+			throw new MongoDBException("Error occured while placing bid for the product in mongo db");
+		}
+		return buyerId;
 	}
 
 }

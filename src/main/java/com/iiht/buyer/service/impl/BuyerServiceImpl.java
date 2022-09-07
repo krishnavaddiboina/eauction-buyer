@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import com.iiht.buyer.exception.BiddingException;
-import com.iiht.buyer.exception.DeleteBidException;
 import com.iiht.buyer.exception.InvalidInputException;
+import com.iiht.buyer.exception.MongoDBException;
 import com.iiht.buyer.model.Buyer;
 import com.iiht.buyer.model.Product;
 import com.iiht.buyer.model.ProductResponse;
@@ -36,8 +36,8 @@ public class BuyerServiceImpl implements BuyerService {
 	BuyerDataValidator validator;
 
 	@Override
-	public void placeBidForProduct(Buyer buyer, ProductResponse response)
-			throws InvalidInputException, BiddingException {
+	public String placeBidForProduct(Buyer buyer, ProductResponse response)
+			throws InvalidInputException, BiddingException, MongoDBException {
 
 		log.debug("Within placeBidForProduct() of BuyerServiceImpl class...");
 		validator.validateRequestData(buyer, response);
@@ -49,44 +49,49 @@ public class BuyerServiceImpl implements BuyerService {
 			LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
 
 			if (currentDate.isAfter(bidEnddate)) {
-				log.error("Bid end date expired");
+				log.error("Bid end date expired....");
 				throw new InvalidInputException("Bid end date expired", response);
 			}
-		}
-
+			
 			boolean flag = buyerRepository.isBidExistWithUser(buyer.getProductId(), buyer.getEmail());
 			if (flag == true) {
 				log.error("Only one bid allowed for the product");
 				throw new BiddingException("Only one bid allowed for the product", response);
 			}
+			log.info("Going to place the bid...");
+			return buyerRepository.placeBidForProduct(buyer);
+		}else {
+			log.error("Product Id does not exist....");
+			throw new InvalidInputException("Product Id does not exist", response);
+		}
 
-			buyerRepository.placeBidForProduct(buyer);
+			
 
 		
 
 	}
 
 	@Override
-	public void updateBidForProduct(String productId, String buyerEmailId, String newBidAmount)
-			throws InvalidDateException {
+	public boolean updateBidForProduct(String productId, String buyerEmailId, String newBidAmount, ProductResponse response)
+			throws InvalidInputException, MongoDBException {
+		log.debug("Within updateBidForProduct() of BuyerServiceImpl class....");
 		Product product = buyerRepository.getProductDetails(productId);
-		if (product.getBidEndDate() != null) {
-			String dateFormat = "yyyy-MM-dd";
+		if (product != null && product.getBidEndDate() != null) {
+			LocalDate bidEnddate = getFormattedBidEndDate(product.getBidEndDate());
+			LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
 
-			String bidEndDate = product.getBidEndDate().toInstant().atOffset(ZoneOffset.UTC)
-					.format(DateTimeFormatter.ofPattern(dateFormat));
-
-			LocalDate localDate = LocalDate.now(ZoneId.systemDefault());
-
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateFormat);
-			LocalDate thebidEndDate = LocalDate.parse(bidEndDate, dtf);
-
-			if (localDate.isAfter(thebidEndDate)) {
-				throw new InvalidDateException("Bid end date expired");
+			if (currentDate.isAfter(bidEnddate)) {
+				log.error("Bid end date expired....");
+				throw new InvalidInputException("Bid end date expired", response);
 			}
+			
+			return buyerRepository.updateBidData(productId, buyerEmailId, newBidAmount);
+		}else {
+			log.error("Product Id does not exist....");
+			throw new InvalidInputException("Product Id does not exist", response);
 		}
 
-		buyerRepository.updateBidData(productId, buyerEmailId, newBidAmount);
+		
 
 	}
 	

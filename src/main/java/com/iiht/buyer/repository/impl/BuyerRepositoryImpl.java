@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BuyerRepositoryImpl implements BuyerRepository {
 
 	@Autowired
-	MongoTemplate mongoTemplate;
+	private MongoTemplate mongoTemplate;
 
 	@Override
 	public Product getProductDetails(String productId) throws MongoDBException {

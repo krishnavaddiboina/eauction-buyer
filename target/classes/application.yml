@@ -1,7 +1,5 @@
 server:
-  port: 8082
-  servlet:
-    context-path: /buyer
+  port: 8082  
 spring:
   data:
     mongodb:

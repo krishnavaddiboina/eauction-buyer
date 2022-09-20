@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.3</version>
+		<version>2.7.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.iiht.buyer</groupId>
@@ -15,6 +15,11 @@
 	<description>Buyer bidding</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.exclusions>src/main/java/com/iiht/buyer/config/*,
+		src/main/java/com/iiht/buyer/model/*,
+		src/main/java/com/iiht/buyer/exception/*,
+		src/main/java/com/iiht/buyer/util/*
+		</sonar.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -43,12 +48,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<scope>test</scope>
-		</dependency>
+		</dependency>		
 	</dependencies>
 
 	<build>
@@ -64,6 +64,26 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.jacoco</groupId>
+			  <artifactId>jacoco-maven-plugin</artifactId>
+			  <version>0.8.7</version>
+			  <executions>
+			  	<execution>
+			  		<id>jacoco-initialize</id>
+			  		<goals>
+			  			<goal>prepare-agent</goal>
+			  		</goals>
+			  	</execution>
+			  	<execution>
+			  		<id>jacoco-site</id>
+			  		<phase>package</phase>
+			  		<goals>
+			  			<goal>report</goal>
+			  		</goals>
+			  	</execution>
+			  </executions>
 			</plugin>
 		</plugins>
 	</build>

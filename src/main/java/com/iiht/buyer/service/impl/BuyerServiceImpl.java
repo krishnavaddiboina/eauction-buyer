@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import com.iiht.buyer.exception.BiddingException;
@@ -18,8 +17,8 @@ import com.iiht.buyer.model.Product;
 import com.iiht.buyer.model.ProductResponse;
 import com.iiht.buyer.repository.BuyerRepository;
 import com.iiht.buyer.service.BuyerService;
-import com.iiht.buyer.validator.BuyerDataValidator;
 import com.iiht.buyer.util.AppConstants;
+import com.iiht.buyer.validator.BuyerDataValidator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,7 +53,7 @@ public class BuyerServiceImpl implements BuyerService {
 			}
 			
 			boolean flag = buyerRepository.isBidExistWithUser(buyer.getProductId(), buyer.getEmail());
-			if (flag == true) {
+			if (flag) {
 				log.error("Only one bid allowed for the product");
 				throw new BiddingException("Only one bid allowed for the product", response);
 			}

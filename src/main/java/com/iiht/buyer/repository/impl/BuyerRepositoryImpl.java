@@ -2,7 +2,6 @@ package com.iiht.buyer.repository.impl;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -45,7 +44,7 @@ public class BuyerRepositoryImpl implements BuyerRepository {
 		try {
 			Query query = new Query(Criteria.where("productId").is(productId));
 			List<Buyer> buyers = mongoTemplate.find(query, Buyer.class);
-			if (buyers != null && buyers.size() > 0) {
+			if (!buyers.isEmpty()) {
 				long count = buyers.stream().filter(buyer -> buyer.getEmail().equalsIgnoreCase(buyerEmail)).count();
 				if (count == 1) {
 					flag = true;
@@ -78,18 +77,15 @@ public class BuyerRepositoryImpl implements BuyerRepository {
 
 	@Override
 	public String placeBidForProduct(Buyer buyer) throws MongoDBException {
-		log.debug("Within placeBidForProduct() of BuyerRepositoryImpl class...");
-		String buyerId = null;
+		log.debug("Within placeBidForProduct() of BuyerRepositoryImpl class...");		
 		try {
-			Buyer theBuyer = mongoTemplate.save(buyer);
-			if (theBuyer != null) {
-				return theBuyer.getId();
-			}
+			Buyer theBuyer = mongoTemplate.save(buyer);			
+			return theBuyer.getId();
+			
 		} catch (Exception exception) {
 			log.error("Error occured while placing bid for the product. Error is {}", exception.getMessage());
 			throw new MongoDBException("Error occured while placing bid for the product in mongo db");
-		}
-		return buyerId;
+		}		
 	}
 
 }

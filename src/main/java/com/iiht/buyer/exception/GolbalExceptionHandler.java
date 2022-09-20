@@ -22,16 +22,16 @@ public class GolbalExceptionHandler {
 		log.error("Withing handleInvalidInputException() of GolbalExceptionHandler. Error is {}", exception.getMessage());
 		ProductResponse productResponse = exception.getProductResponse();
 		productResponse.setResponseTime(new Date());
-		return new ResponseEntity<ProductResponse>(productResponse, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(productResponse, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(MongoDBException.class)
-	public ResponseEntity<ProductResponse> INTERNAL_SERVER_ERROR(MongoDBException exception){
+	public ResponseEntity<ProductResponse> handleInternalServerException(MongoDBException exception){
 		log.error("Withing handleMongoDBException() of GolbalExceptionHandler. Error is {}", exception.getMessage());
 		ProductResponse productResponse = exception.getProductResponse();
 		productResponse.setResponseTime(new Date());
-		return new ResponseEntity<ProductResponse>(productResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(productResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -40,7 +40,7 @@ public class GolbalExceptionHandler {
 		log.error("Withing handleDeleteBidException() of GolbalExceptionHandler. Error is {}", exception.getMessage());
 		ProductResponse productResponse = exception.getProductResponse();
 		productResponse.setResponseTime(new Date());
-		return new ResponseEntity<ProductResponse>(productResponse, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(productResponse, HttpStatus.BAD_REQUEST);
 	}
 	
 	

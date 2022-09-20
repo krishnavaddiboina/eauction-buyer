@@ -2,8 +2,6 @@ package com.iiht.buyer.controller;
 
 import java.util.Date;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,26 +31,25 @@ public class BuyerController {
 
 	@PostMapping("/place-bid")
 	public ResponseEntity<ProductResponse> placeBidForProduct(@RequestBody BuyerDTO buyerDto)
-			throws InvalidInputException, BiddingException, MongoDBException {
-		ProductResponse response = new ProductResponse();
+			throws InvalidInputException, BiddingException, MongoDBException {	
 
 		log.info("Received buyer in the controller...buyer is {}", buyerDto);
 		ProductResponse productResponse = new ProductResponse();
 
 		Buyer buyer = new Buyer();
 		BeanUtils.copyProperties(buyerDto, buyer);
-		String buyerId = buyerService.placeBidForProduct(buyer, response);
+		String buyerId = buyerService.placeBidForProduct(buyer, productResponse);
 		log.info("After adding the buyer, buyer id is {} ", buyerId);
 		productResponse.setResponseTime(new Date());
 		if (buyerId != null) {
 			productResponse.setMessage("Bid placed successfully");
 			productResponse.setStatus(String.valueOf(HttpStatus.CREATED.value()));
-			return new ResponseEntity<ProductResponse>(productResponse, HttpStatus.CREATED);
+			return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
 		} else {
 			log.info("Bid placing failure...");
 			productResponse.setMessage("Not able to place bid");
 			productResponse.setStatus(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-			return new ResponseEntity<ProductResponse>(productResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(productResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -67,16 +64,16 @@ public class BuyerController {
 		ProductResponse response = new ProductResponse();
 
 		boolean flag = buyerService.updateBidForProduct(productId, buyerEmailId, newBidAmount, response);
-		if(flag == true) {
+		if(flag) {
 			log.info("Bid updated successfully.");
 			response.setMessage("Bid updated successfully");
 			response.setStatus(String.valueOf(HttpStatus.OK.value()));
-			return new ResponseEntity<ProductResponse>(response, HttpStatus.OK);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}else {
 			log.info("Not able to update bid amount.");
 			response.setMessage("Not able to update bid amount.");
 			response.setStatus(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-			return new ResponseEntity<ProductResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}

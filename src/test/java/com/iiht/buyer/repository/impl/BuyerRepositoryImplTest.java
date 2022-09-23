@@ -59,13 +59,8 @@ class BuyerRepositoryImplTest {
 		
 		Mockito.when(mongoTemplate.find(Mockito.any(), Mockito.any())).thenReturn(buyers);
 		assertEquals(true, buyerRepositoryImpl.isBidExistWithUser(productId, email));
-	}
+	}	
 	
-	@Test
-	void testUpdateBidData() {
-		UpdateResult updateResult = null;
-		Mockito.when(mongoTemplate.updateFirst(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(updateResult);
-	}
 	
 	@Test
 	void testPlaceBidForProduct() throws MongoDBException {

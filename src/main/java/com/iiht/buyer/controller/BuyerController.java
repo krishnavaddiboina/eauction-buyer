@@ -32,7 +32,7 @@ public class BuyerController {
 
 	@PostMapping("/place-bid")
 	public ResponseEntity<ProductResponse> placeBidForProduct(@RequestBody BuyerDTO buyerDto)
-			throws InvalidInputException, BiddingException, MongoDBException {	
+			throws InvalidInputException, BiddingException, MongoDBException {
 
 		log.info("Received buyer in the controller...buyer is {}", buyerDto);
 		ProductResponse productResponse = new ProductResponse();
@@ -65,18 +65,18 @@ public class BuyerController {
 		ProductResponse response = new ProductResponse();
 
 		boolean flag = buyerService.updateBidForProduct(productId, buyerEmailId, newBidAmount, response);
-		if(flag) {
+		if (flag) {
 			log.info("Bid updated successfully.");
 			response.setMessage("Bid updated successfully");
 			response.setStatus(String.valueOf(HttpStatus.OK.value()));
 			return new ResponseEntity<>(response, HttpStatus.OK);
-		}else {
+		} else {
 			log.info("Not able to update bid amount.");
 			response.setMessage("Not able to update bid amount.");
 			response.setStatus(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-	}	
+	}
 
 }

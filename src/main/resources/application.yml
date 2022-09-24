@@ -5,8 +5,10 @@ server:
 spring:
   data:
     mongodb:
-      database: eauction
-      uri: mongodb://localhost:27017/eauction
+       database: eauction-db
+       uri: mongodb://eauction-db:oZffncNz64aGEGFDauqqCke5RDW0G4KVSq9KnLQa89c4BieYNcyU9vrRS8FdQazZFXWIyqS9SaaS3zGhlAS6AQ==@eauction-db.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@eauction-db@
+
+
 
 
 
